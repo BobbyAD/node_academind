@@ -28,7 +28,14 @@ const server = http.createServer((req, res) => {
         req.on("end", () => {
             const parsedBody = Buffer.concat(body).toString(); // converting to string because I know it's a string
             const message = parsedBody.split("=")[1];
-            fs.writeFileSync("message.txt", message);
+            // synchronous, blocking execution
+            // fs.writeFileSync("message.txt", message);
+            // asynchronous, non-blocking
+            fs.writeFile("message.txt", message, (err) => {
+                if (err) {
+                    console.log(err);
+                }
+            });
         });
 
         res.writeHead(302, {
