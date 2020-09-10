@@ -1,10 +1,12 @@
 const http = require("http");
+const fs = require("fs");
 
 const server = http.createServer((req, res) => {
     // hard exits, don't use this
     // process.exit();
 
     const url = req.url;
+    const method = req.method;
 
     if (url === "/") {
         res.write("<html>");
@@ -13,6 +15,13 @@ const server = http.createServer((req, res) => {
             "<body><form action='/message' method='POST'><input type='text'><button type='submit'>Send</button></input></form></body>"
         );
         res.write("</html>");
+        return res.end();
+    }
+    if (url === '/message' && method === 'POST') {
+        fs.writeFileSync('message.txt', 'DUMMY')
+        res.writeHead(302, {
+            'Location': '/'
+        });
         return res.end();
     }
 
