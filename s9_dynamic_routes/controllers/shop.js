@@ -33,24 +33,29 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getCart = (req, res, next) => {
-    Cart.getCart(cart => {
-        Product.fetchAll(products => {
-            const cartProducts = []
+    Cart.getCart((cart) => {
+        Product.fetchAll((products) => {
+            const cartProducts = [];
             for (product of products) {
-                const cartProductData = cart.products.find(prod => prod.id === product.id)
+                const cartProductData = cart.products.find(
+                    (prod) => prod.id === product.id
+                );
                 // this is O(n^2), bad
                 if (cartProductData) {
-                    cartProducts.push({productData: product, qty: cartProductData.qty});
+                    cartProducts.push({
+                        productData: product,
+                        qty: cartProductData.qty,
+                    });
                 }
             }
 
             res.render("shop/cart", {
                 path: "/cart",
                 pageTitle: "Your Cart",
-                products: cartProducts
+                products: cartProducts,
             });
-        })
-    })
+        });
+    });
 };
 
 exports.postCart = (req, res) => {
@@ -58,7 +63,15 @@ exports.postCart = (req, res) => {
     Product.findById(prodId, (product) => {
         Cart.addProduct(prodId, product.price);
     });
-    res.redirect("/")
+    res.redirect("/");
+};
+
+exports.postCartDelete = (req, res) => {
+    const prodId = req.body.productId;
+    Product.findById(prodId, (product) => {
+        Cart.deleteById(prodId, product.price);
+        res.redirect("/cart");
+    });
 };
 
 exports.getOrders = (req, res, next) => {
