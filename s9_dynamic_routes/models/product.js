@@ -1,6 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 
+const Cart = require("./cart");
+
 const p = path.join(
     path.dirname(process.mainModule.filename),
     "data",
@@ -33,11 +35,11 @@ module.exports = class Product {
                     (prod) => prod.id === this.id
                 );
                 products[existingProductIndex] = this;
-                fs.writeFile(p, JSON.stringify(products), err => {
+                fs.writeFile(p, JSON.stringify(products), (err) => {
                     if (err) {
                         console.log(err);
                     }
-                })
+                });
             } else {
                 this.id = Math.random().toString();
                 products.push(this);
@@ -58,6 +60,28 @@ module.exports = class Product {
         getProductsFromFile((products) => {
             const product = products.find((p) => p.id === id);
             cb(product);
+        });
+    }
+
+    static deleteById(id) {
+        getProductsFromFile((products) => {
+            var prod;
+            const updatedProducts = products.filter((product) => {
+                if (product.id === id) {
+                    prod = product
+                    return false;
+                } else {
+                    return true;
+                }
+            });
+
+            fs.writeFile(p, JSON.stringify(updatedProducts), (err) => {
+                if (err) {
+                    console.log(err);
+                } else {
+                    Cart.deleteById(id, prod.price);
+                }
+            });
         });
     }
 };
